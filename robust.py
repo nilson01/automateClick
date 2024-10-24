@@ -78,11 +78,9 @@ def metamask_process(metamask_icon_path, speedup_button_path, submit_button_path
     # Step 1: Click MetaMask Icon
     search_and_click(metamask_icon_path, label="MetaMask Icon", threshold=0.8)
 
-    # Step 2: Click Speed Up button
+    # Step 2: Click Confirmed button
     search_and_click(speedup_button_path, label="Speed Up", threshold=0.8)
 
-    # Step 3: Click Submit button
-    search_and_click(submit_button_path, label="Submit", threshold=0.8)
 
     print("MetaMask process complete. Returning to Write button search.")
     logging.info("MetaMask process complete.")
@@ -143,7 +141,9 @@ def main(mode):
         'confirm_button': r"source/confirm_button.png"
     }
     metamask_icon_path = r"source/metamask.png"
-    speedup_button_path = r"source/speedup_button.png"
+    speedup_button_path = r"source/confirmed.png"
+
+    # speedup_button_path = r"source/speedup_button.png"
     submit_button_path = r"source/Submit_button.png"
 
     # Call the function with the list of image paths and the determined duration

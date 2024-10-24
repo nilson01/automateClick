@@ -31,7 +31,8 @@ def search_and_click(images, threshold=0.9, click_delay=0.01, duration=60):
     # Timer to run the loop
     start_time = time.time()
 
-    while time.time() - start_time < duration:
+    while time.time() - start_time < duration: 
+        
         # Capture screen image using pyautogui
         screenshot = pyautogui.screenshot()
         screen_np = np.array(screenshot)
@@ -70,7 +71,8 @@ def search_and_click(images, threshold=0.9, click_delay=0.01, duration=60):
                     logging.info(f"Timestamp: {timestamp}, Coordinates: ({scaled_x}, {scaled_y}), Probability: {max_probability:.2f}")
 
                     # Delay between clicks
-                    time.sleep(click_delay)
+                    # time.sleep(click_delay)
+        time.sleep(click_delay)
 
 def get_image_paths():
     """Get image paths based on the user's operating system."""
@@ -102,7 +104,7 @@ def main():
         duration = 60  # 1 minute
         print("Running in testing mode for 1 minute.")
     elif mode == 'production' or mode == '1':
-        duration = 60 * 60  # 1 hour
+        duration = 60 * 60 * 5  # 1 hour
         print("Running in production mode for 1 hour.")
     else:
         print("Invalid mode. Please use 'testing' or 'production'.")
@@ -112,7 +114,7 @@ def main():
     image_paths = get_image_paths()
 
     # Start the automation process
-    search_and_click(image_paths, threshold=0.9, duration=duration)
+    search_and_click(image_paths, threshold=0.9, click_delay=20, duration=duration)
 
 if __name__ == "__main__":
     main()
