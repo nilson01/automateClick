@@ -1,149 +1,108 @@
 import cv2
-import pyautogui
 import numpy as np
+import pyautogui
 import time
 import os
+import logging
 from datetime import datetime
-from PIL import ImageGrab
 
-def load_image(image_path):
-    """Loads an image from the provided path."""
-    return cv2.imread(image_path)
+# Set up logging
+logging.basicConfig(filename='clicker.log', level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s: %(message)s')
 
-def capture_screen_to_file(file_name):
-    """Captures a screenshot of the current screen and saves it as an image file."""
-    screenshot = ImageGrab.grab()
-    screenshot_np = np.array(screenshot)
-    screenshot_rgb = cv2.cvtColor(screenshot_np, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(file_name, screenshot_rgb)
+# Function to search for images on the screen and click on them if found
+def search_and_click(images, threshold=0.8, click_delay=0.01, duration=60):
+    # Set the template matching method
+    method = cv2.TM_CCOEFF_NORMED
 
-def multi_scale_template_match(screen_image, template_image, threshold=0.8):
-    """Performs multi-scale template matching to find the template on the screen image."""
-    template_gray = cv2.cvtColor(template_image, cv2.COLOR_BGR2GRAY)
-    screen_gray = cv2.cvtColor(screen_image, cv2.COLOR_BGR2GRAY)
-
-    template_h, template_w = template_gray.shape[:2]
-    
-    best_match = None
-    best_val = 0
-    best_template_size = (template_w, template_h)
-    
-    # Loop over scales to handle different sizes of the button
-    for scale in np.linspace(0.5, 1.5, 20):
-        # Resize the template according to the scale
-        resized_template = cv2.resize(template_gray, (int(template_w * scale), int(template_h * scale)))
-        res = cv2.matchTemplate(screen_gray, resized_template, cv2.TM_CCOEFF_NORMED)
-        
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        
-        if max_val > threshold and max_val > best_val:
-            best_val = max_val
-            best_match = max_loc
-            # Resize dimensions according to the matched scale
-            best_template_size = (int(template_w * scale), int(template_h * scale))
-    
-    return best_match, best_template_size, best_val
-
-def annotate_and_save_image(screen_image, match_location, template_size, match_probability, folder_path, button_name):
-    """Annotates the matched location by drawing a rectangle and adding the match probability and coordinates."""
-    if match_location:
-        x, y = match_location
-        w, h = template_size
-    
-        # Draw a rectangle around the matched area
-        cv2.rectangle(screen_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        # Annotate with probability and coordinates
-        text = f"Prob: {match_probability:.2f}, Coord: ({x}, {y})"
-        cv2.putText(screen_image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-        
-        # Generate the file path with timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        output_path = os.path.join(folder_path, f'annotated_{button_name}_{timestamp}.png')
-
-        # Save the annotated image
-        cv2.imwrite(output_path, screen_image)
-        print(f"Annotated image saved to {output_path}")
-    else:
-        print(f"No match found for {button_name}, so no annotation was done.")
-
-def click_button_on_screen(template_image_path, button_name, folder_path, threshold=0.8):
-    """Captures the screen, looks for the template, clicks on the button when found, and annotates the image."""
-    template_image = load_image(template_image_path)
-
-    # Get screen size
+    # Get the actual screen resolution
     screen_width, screen_height = pyautogui.size()
 
-    while True:
-        # Capture the current screen to a fixed file name (overwrite each time)
-        capture_screen_to_file(f'test_{button_name}.png')
-
-        # Load the captured screen image
-        screen_image = load_image(f'test_{button_name}.png')
-        
-        # Get the screenshot dimensions
-        screenshot_height, screenshot_width = screen_image.shape[:2]
-        
-        # Calculate the scaling factors between the screenshot and the screen
-        scale_x = screen_width / screenshot_width
-        scale_y = screen_height / screenshot_height
-        
-        # Find the button on the screen
-        match_location, template_size, match_probability = multi_scale_template_match(screen_image, template_image, threshold)
-        
-        if match_location:
-            # Calculate the center of the detected button
-            x, y = match_location
-            w, h = template_size
-            center_x = x + w // 2
-            center_y = y + h // 2
-
-            # Adjust the coordinates based on the scaling factor
-            adjusted_center_x = int(center_x * scale_x)
-            adjusted_center_y = int(center_y * scale_y)
-
-            # Simulate a click using PyAutoGUI at the center of the button
-            pyautogui.click(adjusted_center_x, adjusted_center_y)
-            print(f"{button_name} button clicked at coordinates: ({adjusted_center_x}, {adjusted_center_y}) with probability {match_probability:.2f}")
-
-            # Annotate the screenshot with the match information
-            annotate_and_save_image(screen_image, match_location, template_size, match_probability, folder_path, button_name)
-
-            break  # Exit the loop after clicking
-
-        else:
-            print(f"{button_name} button not found, waiting and retrying...")
-            time.sleep(1)  # Wait before trying again
-
-def main():
-    # Create the images folder if it doesn't exist
-    folder_path = 'images'
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-
-    # Run the process for 1 hour
+    # Timer for running the loop
     start_time = time.time()
-    duration = 60 * 1  # for 1 hour use -> 60x60
 
     while time.time() - start_time < duration:
-        # Path to the "Write" button template image
-        write_button_template = 'write_button.png'
+        # Capture the screen image using pyautogui (faster than PIL/ImageGrab)
+        screenshot = pyautogui.screenshot()
+        screen_np = np.array(screenshot)
+        screen_gray = cv2.cvtColor(screen_np, cv2.COLOR_RGB2GRAY)
 
-        # Find and click the "Write" button, save annotated image
-        click_button_on_screen(write_button_template, 'Write', folder_path)
+        # Get the screenshot dimensions (they could differ from the screen size)
+        screenshot_height, screenshot_width = screen_gray.shape[:2]
 
-        time.sleep(2)  # Wait before trying again
+        # Calculate scaling factors if the screenshot size differs from the screen size
+        scale_x = screen_width / screenshot_width
+        scale_y = screen_height / screenshot_height
 
-        # Path to the "Confirm" button template image
-        confirm_button_template = 'confirm_button.png'
+        # Iterate through each image in the provided list of images
+        for image_path in images:
+            if not os.path.exists(image_path):
+                logging.error(f"Image not found at '{image_path}'")
+                continue  # Skip to the next image if the file doesn't exist
 
-        # After "Write" is clicked, find and click the "Confirm" button, save annotated image
-        click_button_on_screen(confirm_button_template, 'Confirm', folder_path)
+            # Load the template image from the disk
+            template = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
-        # Optional: sleep for a short interval before repeating
-        time.sleep(2)  # To avoid constant loop, you can adjust the sleep time
+            # Perform template matching
+            result = cv2.matchTemplate(screen_gray, template, method)
 
-    print("1 hour process completed.")
+            # Get the locations where matches are above the specified threshold
+            loc = np.where(result >= threshold)
 
-if __name__ == '__main__':
-    main()
+            # Click on the matched locations
+            if loc[0].size > 0:
+                for pt in zip(*loc[::-1]):
+                    # Calculate the center of the matched template
+                    x, y = pt[0] + template.shape[1] // 2, pt[1] + template.shape[0] // 2
+
+                    # Scale the coordinates to match the actual screen resolution
+                    scaled_x = int(x * scale_x)
+                    scaled_y = int(y * scale_y)
+
+                    # Get the current timestamp
+                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                    # Click on the center of the matched template
+                    pyautogui.click(scaled_x, scaled_y)
+
+                    # Get the maximum probability from the match result
+                    max_probability = result[pt[1], pt[0]]
+
+                    # Print in reverse order: timestamp, coordinates, probability
+                    print(f"{timestamp} | Coordinates: ({scaled_x}, {scaled_y}) | Probability: {max_probability:.2f}")
+
+                    # Log the same information
+                    logging.info(f"Timestamp: {timestamp}, Coordinates: ({scaled_x}, {scaled_y}), Probability: {max_probability:.2f}")
+
+                    # Delay between clicks
+                    time.sleep(click_delay)
+
+# Main function to execute the script
+def main(mode):
+    # Determine the duration based on mode
+    if mode == 'testing' or mode == '0':
+        duration = 60  # 1 minute in seconds
+        print("Running in testing mode for 1 minute.")
+    elif mode == 'production' or mode == '1':
+        duration = 60 * 1  # 1 hour in seconds -> 60x60
+        print("Running in production mode for 1 hour.")
+    else:
+        print("Invalid mode. Please use 'testing' or 'production'.")
+        return
+
+    # List of image paths to search for on the screen (place the paths to your actual images)
+    image_paths = [
+        r"source/write_button.png",
+        r"source/confirm_button.png",
+        # Add more image paths as needed
+    ]
+
+    # Call the function with the list of image paths and the determined duration
+    search_and_click(image_paths, threshold=0.9, duration=duration)
+
+
+# Entry point of the script
+if __name__ == "__main__":
+    # You can pass 'testing' or 'production' mode as an argument
+    mode = input("Enter mode (testing/production): ").strip().lower()
+    main(mode)

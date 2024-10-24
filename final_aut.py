@@ -1,180 +1,156 @@
 import cv2
-import pyautogui
 import numpy as np
+import pyautogui
 import time
 import os
-import sys
+import logging
 from datetime import datetime
-from PIL import ImageGrab
+
+# Set up logging
+logging.basicConfig(filename='clicker.log', level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s: %(message)s')
 
 def load_image(image_path):
     """Loads an image from the provided path."""
-    return cv2.imread(image_path)
+    return cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
-def capture_screen_to_file(file_name):
-    """Captures a screenshot of the current screen and saves it as an image file."""
-    screenshot = ImageGrab.grab()
-    screenshot_np = np.array(screenshot)
-    screenshot_rgb = cv2.cvtColor(screenshot_np, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(file_name, screenshot_rgb)
-
-def multi_scale_template_match(screen_image, template_image, threshold=0.8):
-    """Performs multi-scale template matching to find the template on the screen image."""
-    template_gray = cv2.cvtColor(template_image, cv2.COLOR_BGR2GRAY)
-    screen_gray = cv2.cvtColor(screen_image, cv2.COLOR_BGR2GRAY)
-
-    template_h, template_w = template_gray.shape[:2]
+def search_and_click(image_path, label, method=cv2.TM_CCOEFF_NORMED, threshold=0.9):
+    """Searches for an image on the screen and clicks it. 
+    This function will keep searching until the image is found and clicked."""
     
-    best_match = None
-    best_val = 0
-    best_template_size = (template_w, template_h)
-    
-    # Loop over scales to handle different sizes of the button
-    for scale in np.linspace(0.5, 1.5, 20):
-        # Resize the template according to the scale
-        resized_template = cv2.resize(template_gray, (int(template_w * scale), int(template_h * scale)))
-        res = cv2.matchTemplate(screen_gray, resized_template, cv2.TM_CCOEFF_NORMED)
-        
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        
-        if max_val > threshold and max_val > best_val:
-            best_val = max_val
-            best_match = max_loc
-            # Resize dimensions according to the matched scale
-            best_template_size = (int(template_w * scale), int(template_h * scale))
-    
-    return best_match, best_template_size, best_val
-
-def annotate_and_save_image(screen_image, match_location, template_size, match_probability, folder_path, button_name):
-    """Annotates the matched location by drawing a rectangle and adding the match probability and coordinates."""
-    if match_location:
-        x, y = match_location
-        w, h = template_size
-    
-        # Draw a rectangle around the matched area
-        cv2.rectangle(screen_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        # Annotate with probability and coordinates
-        text = f"Prob: {match_probability:.2f}, Coord: ({x}, {y})"
-        cv2.putText(screen_image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-        
-        # Generate the file path with timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        output_path = os.path.join(folder_path, f'annotated_{button_name}_{timestamp}.png')
-
-        # Save the annotated image
-        cv2.imwrite(output_path, screen_image)
-        print(f"Annotated image saved to {output_path}")
-    else:
-        print(f"No match found for {button_name}, so no annotation was done.")
-
-def click_button_on_screen(template_image_path, button_name, folder_path, save_images, threshold=0.8):
-    """Captures the screen, looks for the template, clicks on the button when found, and annotates the image with timestamp."""
-    template_image = load_image(template_image_path)
-
-    # Get screen size
-    screen_width, screen_height = pyautogui.size()
-
     while True:
-        # Capture the current screen to a fixed file name (overwrite each time)
-        capture_screen_to_file(f'test_{button_name}.png')
+        screenshot = pyautogui.screenshot()
+        screen_np = np.array(screenshot)
+        screen_gray = cv2.cvtColor(screen_np, cv2.COLOR_RGB2GRAY)
 
-        # Load the captured screen image
-        screen_image = load_image(f'test_{button_name}.png')
-        
-        # Get the screenshot dimensions
-        screenshot_height, screenshot_width = screen_image.shape[:2]
-        
-        # Calculate the scaling factors between the screenshot and the screen
+        # Get screen size
+        screen_width, screen_height = pyautogui.size()
+        screenshot_height, screenshot_width = screen_gray.shape[:2]
+
         scale_x = screen_width / screenshot_width
         scale_y = screen_height / screenshot_height
-        
-        # Find the button on the screen
-        match_location, template_size, match_probability = multi_scale_template_match(screen_image, template_image, threshold)
-        
-        if match_location:
-            # Calculate the center of the detected button
-            x, y = match_location
-            w, h = template_size
-            center_x = x + w // 2
-            center_y = y + h // 2
 
-            # Adjust the coordinates based on the scaling factor
-            adjusted_center_x = int(center_x * scale_x)
-            adjusted_center_y = int(center_y * scale_y)
+        # Load the template image
+        template = load_image(image_path)
 
-            # Simulate a click using PyAutoGUI at the center of the button
-            pyautogui.click(adjusted_center_x, adjusted_center_y)
-            print(f"{button_name} button clicked at coordinates: ({adjusted_center_x}, {adjusted_center_y}) with probability {match_probability:.2f}")
+        # Perform template matching
+        result = cv2.matchTemplate(screen_gray, template, method)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
-            # Annotate and save the screenshot if save_images is True
-            if save_images:
-                annotate_and_save_image(screen_image, match_location, template_size, match_probability, folder_path, button_name)
+        if max_val >= threshold:
+            x, y = max_loc
+            x_center = int(x + template.shape[1] // 2)
+            y_center = int(y + template.shape[0] // 2)
+            scaled_x = int(x_center * scale_x)
+            scaled_y = int(y_center * scale_y)
 
-            break  # Exit the loop after clicking
+            # Click on the center of the matched template
+            pyautogui.click(scaled_x, scaled_y)
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+            # Print and log the click event
+            print(f"{timestamp} | Step: {label} | Clicked at ({scaled_x}, {scaled_y}) | Probability: {max_val:.2f}")
+            logging.info(f"Timestamp: {timestamp}, Step: {label}, Coordinates: ({scaled_x}, {scaled_y}), Probability: {max_val:.2f}")
+            time.sleep(1)  # Short delay to let the click take effect
+
+            return
         else:
-            print(f"{button_name} button not found, waiting and retrying...")
-            time.sleep(1)  # Wait before trying again
+            print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | {label} not found. Retrying...")
+            time.sleep(1)  # Wait for 1 second before retrying
 
-def main(mode, save_images=False):
-    # Create the images folder if it doesn't exist
-    folder_path = 'images'
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+def double_click_write_button(write_button_path):
+    """Click the Write button twice to ensure it is fully clicked."""
+    print("Clicking Write button twice for confirmation...")
+    logging.info("Clicking Write button twice for confirmation...")
 
-    # Set duration based on mode
-    if mode == 'testing':
+    for attempt in range(1, 2):  # Click Write button k times, k = 1
+        search_and_click(write_button_path, label=f"Write Button (attempt {attempt})", threshold=0.95)
+        # time.sleep(1)  # Small delay between clicks to avoid issues
+
+    print("Write button clicked twice, proceeding to Confirm step...")
+    logging.info("Write button clicked twice, proceeding to Confirm step...")
+
+def metamask_process(metamask_icon_path, speedup_button_path, submit_button_path):
+    """Handles the MetaMask process sequentially, without skipping any step."""
+    print("Starting MetaMask process...")
+    logging.info("Starting MetaMask process...")
+
+    # Step 1: Click MetaMask Icon
+    search_and_click(metamask_icon_path, label="MetaMask Icon", threshold=0.8)
+
+    # Step 2: Click Speed Up button
+    search_and_click(speedup_button_path, label="Speed Up", threshold=0.8)
+
+    # Step 3: Click Submit button
+    search_and_click(submit_button_path, label="Submit", threshold=0.8)
+
+    print("MetaMask process complete. Returning to Write button search.")
+    logging.info("MetaMask process complete.")
+
+def search_and_run(images, metamask_icon_path, speedup_button_path, submit_button_path, threshold=0.9, duration=60):
+    """Main loop that searches for images, clicks them, and handles the MetaMask process sequentially."""
+    method = cv2.TM_CCOEFF_NORMED
+
+    # Timer for running the loop
+    start_time = time.time()
+
+    # Track how many rounds have been completed
+    first_round_complete = False
+
+    while time.time() - start_time < duration:
+        # Step 1: Look for the Write button (mandatory)
+        print("Looking for Write Button...")
+        search_and_click(images['write_button'], label="Write Button", threshold=0.95)
+
+        # Step 1.5: If it's the first round, just click once; for subsequent rounds, click twice
+        if first_round_complete:
+            double_click_write_button(images['write_button'])
+        else:
+            print("First round: single click for Write button")
+            logging.info("First round: single click for Write button")
+
+        # Step 2: Look for the Confirm button (mandatory)
+        print("Looking for Confirm Button...")
+        search_and_click(images['confirm_button'], label="Confirm Button", threshold=0.9)
+
+        # Step 3: Perform the MetaMask process (mandatory steps)
+        metamask_process(metamask_icon_path, speedup_button_path, submit_button_path)
+
+        # Mark first round as complete after going through the whole sequence
+        if not first_round_complete:
+            first_round_complete = True
+            print("First round completed, next round will involve double-click for Write button.")
+            logging.info("First round completed, next round will involve double-click for Write button.")
+
+        # After finishing MetaMask process, the loop restarts by looking for the Write button again.
+        # time.sleep(1)  # Short delay before the next iteration
+
+def main(mode):
+    # Determine the duration based on mode
+    if mode == 'testing' or mode == '0':
         duration = 60  # 1 minute in seconds
         print("Running in testing mode for 1 minute.")
-    elif mode == 'production':
-        duration = 60 * 1  # 1 hour in seconds-> 60x60
-        print(f"Running in production mode for 1 hour. Saving images: {save_images}")
+    elif mode == 'production' or mode == '1':
+        duration = 60 * 1  # 1 hour in seconds -> 60x60
+        print("Running in production mode for 1 hour.")
     else:
         print("Invalid mode. Please use 'testing' or 'production'.")
         return
 
-    start_time = time.time()
+    # Paths to image templates
+    image_paths = {
+        'write_button': r"source/write_button.png",
+        'confirm_button': r"source/confirm_button.png"
+    }
+    metamask_icon_path = r"source/metamask.png"
+    speedup_button_path = r"source/speedup_button.png"
+    submit_button_path = r"source/Submit_button.png"
 
-    # Define the source folder for template images
-    source_folder = 'source'
+    # Call the function with the list of image paths and the determined duration
+    search_and_run(image_paths, metamask_icon_path, speedup_button_path, submit_button_path, threshold=0.9, duration=duration)
 
-    while time.time() - start_time < duration:
-
-        # Path to the "Write" button template image in the source folder
-        write_button_template = os.path.join(source_folder, 'write_button.png')
-
-        # Find and click the "Write" button, save annotated image if applicable
-        click_button_on_screen(write_button_template, 'Write', folder_path, save_images)
-
-        # Path to the "Confirm" button template image in the source folder
-        confirm_button_template = os.path.join(source_folder, 'confirm_button.png')
-
-        # After "Write" is clicked, find and click the "Confirm" button, save annotated image if applicable
-        click_button_on_screen(confirm_button_template, 'Confirm', folder_path, save_images)
-
-        # Optional: sleep for a short interval before repeating
-        # time.sleep(2)  # Adjust the sleep time if needed
-
-    print(f"{mode.capitalize()} process completed.")
-
-if __name__ == '__main__':
-    # Get mode from the command line arguments
-    if len(sys.argv) < 2:
-        print("Usage: python script.py <mode> [save_images]")
-        print("Modes: testing, production")
-        print("Optional: Set save_images to 'True' for saving images in production mode.")
-        sys.exit(1)
-
-    mode = sys.argv[1]  # Get the mode ('testing' or 'production')
-
-    # Check if save_images is provided for production mode
-    if mode == 'production' and len(sys.argv) > 2:
-        save_images = sys.argv[2].lower() == 'true'
-    elif mode == 'testing':
-        save_images = True
-    else:
-        save_images = False
-
-    # Run the main function with the specified mode and save_images option
-    main(mode, save_images)
+# Entry point of the script
+if __name__ == "__main__":
+    # You can pass 'testing' or 'production' mode as an argument
+    mode = input("Enter mode (testing/production): ").strip().lower()
+    main(mode)
