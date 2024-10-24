@@ -16,7 +16,7 @@ This project automates clicking buttons on the screen for tasks like confirming 
 ### Step 1: Clone the repository
 ```bash
 git clone https://github.com/yourusername/automation_project.git
-cd automation_project
+cd automateClick
 ```
 
 ### Step 2: Set up the environment

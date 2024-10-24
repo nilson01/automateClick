@@ -1,0 +1,67 @@
+2024-10-24 02:34:52,286 - INFO: Timestamp: 2024-10-24 02:34:52, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:34:58,417 - INFO: Timestamp: 2024-10-24 02:34:58, Coordinates: (925, 1009), Probability: 0.91
+2024-10-24 02:34:58,542 - INFO: Timestamp: 2024-10-24 02:34:58, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:34:58,669 - INFO: Timestamp: 2024-10-24 02:34:58, Coordinates: (925, 1010), Probability: 0.91
+2024-10-24 02:35:09,971 - INFO: Timestamp: 2024-10-24 02:35:09, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:35:15,356 - INFO: Timestamp: 2024-10-24 02:35:15, Coordinates: (925, 1009), Probability: 0.91
+2024-10-24 02:35:15,484 - INFO: Timestamp: 2024-10-24 02:35:15, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:35:15,619 - INFO: Timestamp: 2024-10-24 02:35:15, Coordinates: (925, 1010), Probability: 0.91
+2024-10-24 02:35:26,502 - INFO: Timestamp: 2024-10-24 02:35:26, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:35:31,960 - INFO: Timestamp: 2024-10-24 02:35:31, Coordinates: (925, 1009), Probability: 0.91
+2024-10-24 02:35:32,087 - INFO: Timestamp: 2024-10-24 02:35:32, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:35:32,215 - INFO: Timestamp: 2024-10-24 02:35:32, Coordinates: (925, 1010), Probability: 0.91
+2024-10-24 02:38:35,634 - INFO: Timestamp: 2024-10-24 02:38:35, Step: Write Button, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:38:36,644 - INFO: First round: single click for Write button
+2024-10-24 02:38:42,100 - INFO: Timestamp: 2024-10-24 02:38:42, Step: Confirm Button, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:38:43,111 - INFO: Starting MetaMask process...
+2024-10-24 02:38:44,109 - INFO: Timestamp: 2024-10-24 02:38:43, Step: MetaMask Icon, Coordinates: (1532, 63), Probability: 1.00
+2024-10-24 02:38:49,960 - INFO: Timestamp: 2024-10-24 02:38:49, Step: Speed Up, Coordinates: (1390, 555), Probability: 1.00
+2024-10-24 02:38:51,947 - INFO: Timestamp: 2024-10-24 02:38:51, Step: Submit, Coordinates: (1279, 287), Probability: 1.00
+2024-10-24 02:38:52,954 - INFO: MetaMask process complete.
+2024-10-24 02:38:52,954 - INFO: First round completed, next round will involve double-click for Write button.
+2024-10-24 02:38:57,316 - INFO: Timestamp: 2024-10-24 02:38:57, Step: Write Button, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:38:58,328 - INFO: Clicking Write button twice for confirmation...
+2024-10-24 02:38:59,147 - INFO: Timestamp: 2024-10-24 02:38:59, Step: Write Button (attempt 1), Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:39:35,802 - INFO: Timestamp: 2024-10-24 02:39:35, Step: Write Button (attempt 2), Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:39:36,816 - INFO: Write button clicked twice, proceeding to Confirm step...
+2024-10-24 02:39:51,761 - INFO: Timestamp: 2024-10-24 02:39:51, Step: Confirm Button, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:39:52,789 - INFO: Starting MetaMask process...
+2024-10-24 02:40:15,613 - INFO: Timestamp: 2024-10-24 02:40:15, Step: Write Button, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:40:16,634 - INFO: First round: single click for Write button
+2024-10-24 02:40:22,044 - INFO: Timestamp: 2024-10-24 02:40:22, Step: Confirm Button, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:40:23,160 - INFO: Starting MetaMask process...
+2024-10-24 02:40:24,320 - INFO: Timestamp: 2024-10-24 02:40:24, Step: MetaMask Icon, Coordinates: (1532, 63), Probability: 1.00
+2024-10-24 02:40:28,475 - INFO: Timestamp: 2024-10-24 02:40:28, Step: Speed Up, Coordinates: (1390, 555), Probability: 1.00
+2024-10-24 02:40:30,510 - INFO: Timestamp: 2024-10-24 02:40:30, Step: Submit, Coordinates: (1279, 287), Probability: 1.00
+2024-10-24 02:40:31,522 - INFO: MetaMask process complete.
+2024-10-24 02:40:31,523 - INFO: First round completed, next round will involve double-click for Write button.
+2024-10-24 02:40:32,296 - INFO: Timestamp: 2024-10-24 02:40:32, Step: Write Button, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:40:33,307 - INFO: Clicking Write button twice for confirmation...
+2024-10-24 02:40:34,089 - INFO: Timestamp: 2024-10-24 02:40:34, Step: Write Button (attempt 1), Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:40:35,102 - INFO: Write button clicked twice, proceeding to Confirm step...
+2024-10-24 02:40:38,014 - INFO: Timestamp: 2024-10-24 02:40:38, Step: Confirm Button, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:40:39,022 - INFO: Starting MetaMask process...
+2024-10-24 02:40:39,957 - INFO: Timestamp: 2024-10-24 02:40:39, Step: MetaMask Icon, Coordinates: (1532, 63), Probability: 1.00
+2024-10-24 02:40:45,907 - INFO: Timestamp: 2024-10-24 02:40:45, Step: Speed Up, Coordinates: (1390, 555), Probability: 1.00
+2024-10-24 02:40:47,851 - INFO: Timestamp: 2024-10-24 02:40:47, Step: Submit, Coordinates: (1279, 287), Probability: 1.00
+2024-10-24 02:40:48,864 - INFO: MetaMask process complete.
+2024-10-24 02:40:53,307 - INFO: Timestamp: 2024-10-24 02:40:53, Step: Write Button, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:40:54,318 - INFO: Clicking Write button twice for confirmation...
+2024-10-24 02:40:55,107 - INFO: Timestamp: 2024-10-24 02:40:55, Step: Write Button (attempt 1), Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:40:56,120 - INFO: Write button clicked twice, proceeding to Confirm step...
+2024-10-24 02:40:59,188 - INFO: Timestamp: 2024-10-24 02:40:59, Step: Confirm Button, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:41:00,199 - INFO: Starting MetaMask process...
+2024-10-24 02:41:01,058 - INFO: Timestamp: 2024-10-24 02:41:01, Step: MetaMask Icon, Coordinates: (1532, 63), Probability: 1.00
+2024-10-24 02:41:07,097 - INFO: Timestamp: 2024-10-24 02:41:07, Step: Speed Up, Coordinates: (1390, 555), Probability: 1.00
+2024-10-24 02:41:09,021 - INFO: Timestamp: 2024-10-24 02:41:09, Step: Submit, Coordinates: (1279, 287), Probability: 1.00
+2024-10-24 02:41:10,035 - INFO: MetaMask process complete.
+2024-10-24 02:41:14,574 - INFO: Timestamp: 2024-10-24 02:41:14, Step: Write Button, Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:41:15,583 - INFO: Clicking Write button twice for confirmation...
+2024-10-24 02:41:16,476 - INFO: Timestamp: 2024-10-24 02:41:16, Step: Write Button (attempt 1), Coordinates: (204, 761), Probability: 1.00
+2024-10-24 02:41:17,490 - INFO: Write button clicked twice, proceeding to Confirm step...
+2024-10-24 02:41:20,333 - INFO: Timestamp: 2024-10-24 02:41:20, Step: Confirm Button, Coordinates: (925, 1010), Probability: 1.00
+2024-10-24 02:41:21,344 - INFO: Starting MetaMask process...
+2024-10-24 02:41:22,425 - INFO: Timestamp: 2024-10-24 02:41:22, Step: MetaMask Icon, Coordinates: (1532, 63), Probability: 1.00
+2024-10-24 02:41:28,151 - INFO: Timestamp: 2024-10-24 02:41:28, Step: Speed Up, Coordinates: (1390, 555), Probability: 1.00
+2024-10-24 02:41:30,108 - INFO: Timestamp: 2024-10-24 02:41:30, Step: Submit, Coordinates: (1279, 287), Probability: 1.00
+2024-10-24 02:41:31,120 - INFO: MetaMask process complete.

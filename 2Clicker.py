@@ -5,6 +5,7 @@ import time
 import os
 import logging
 from datetime import datetime
+import platform
 
 # Set up logging
 logging.basicConfig(filename='clicker.log', level=logging.INFO,
@@ -71,6 +72,27 @@ def search_and_click(images, threshold=0.9, click_delay=0.01, duration=60):
                     # Delay between clicks
                     time.sleep(click_delay)
 
+def get_image_paths():
+    """Get image paths based on the user's operating system."""
+    
+    # Get current OS
+    system = platform.system()
+
+    # Get the base path for images
+    base_path = os.path.join(os.getcwd(), "source")
+
+    # Set up image paths depending on the OS
+    if system == "Windows":
+        print("Running on Windows")
+        write_button_path = os.path.join(base_path, "write_button.png")
+        confirm_button_path = os.path.join(base_path, "confirm_button.png")
+    else:
+        print(f"Running on {system}")
+        write_button_path = os.path.join(base_path, "write_button.png")
+        confirm_button_path = os.path.join(base_path, "confirm_button.png")
+
+    return [write_button_path, confirm_button_path]
+
 def main():
     """Main function to run the script based on mode (testing or production)."""
     
@@ -86,11 +108,8 @@ def main():
         print("Invalid mode. Please use 'testing' or 'production'.")
         return
 
-    # Define the image paths
-    image_paths = [
-        r"source/write_button.png",  # Users can replace this with their own button image
-        r"source/confirm_button.png" # Users can replace this with their own button image
-    ]
+    # Get the image paths based on OS
+    image_paths = get_image_paths()
 
     # Start the automation process
     search_and_click(image_paths, threshold=0.9, duration=duration)
